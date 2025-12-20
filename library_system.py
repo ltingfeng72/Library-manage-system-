@@ -43,6 +43,9 @@ class LibrarySystem:
             CREATE TABLE IF NOT EXISTS readers (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
+                age INTEGER,
+                gender TEXT,
+                address TEXT,
                 user_id INTEGER UNIQUE,
                 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
             );
@@ -52,6 +55,8 @@ class LibrarySystem:
                 isbn TEXT,
                 title TEXT NOT NULL,
                 author TEXT,
+                publisher TEXT,
+                publication_date TEXT,
                 shelf_id INTEGER,
                 total_copies INTEGER NOT NULL DEFAULT 1 CHECK (total_copies > 0),
                 available_copies INTEGER NOT NULL DEFAULT 1 CHECK (available_copies >= 0),
@@ -75,6 +80,8 @@ class LibrarySystem:
                     books.title,
                     books.author,
                     books.isbn,
+                    books.publisher,
+                    books.publication_date,
                     shelves.code AS shelf_code,
                     books.available_copies,
                     books.total_copies
@@ -122,8 +129,8 @@ class LibrarySystem:
 
         # Create readers
         cur.execute(
-            "INSERT OR IGNORE INTO readers (name, user_id) VALUES (?, ?)",
-            ("示例读者", borrower_id),
+            "INSERT OR IGNORE INTO readers (name, age, gender, address, user_id) VALUES (?, ?, ?, ?, ?)",
+            ("示例读者", 25, "男", "北京市朝阳区示例街道1号", borrower_id),
         )
         
         # Get or create reader IDs
@@ -133,60 +140,60 @@ class LibrarySystem:
         
         # Add more readers with user accounts
         cur.execute(
-            "INSERT OR IGNORE INTO readers (name, user_id) VALUES (?, ?)",
-            ("张三", user_zhangsan),
+            "INSERT OR IGNORE INTO readers (name, age, gender, address, user_id) VALUES (?, ?, ?, ?, ?)",
+            ("张三", 28, "男", "上海市浦东新区世纪大道100号", user_zhangsan),
         )
         cur.execute(
-            "INSERT OR IGNORE INTO readers (name, user_id) VALUES (?, ?)",
-            ("李四", user_lisi),
+            "INSERT OR IGNORE INTO readers (name, age, gender, address, user_id) VALUES (?, ?, ?, ?, ?)",
+            ("李四", 32, "女", "广州市天河区珠江新城88号", user_lisi),
         )
         cur.execute(
-            "INSERT OR IGNORE INTO readers (name, user_id) VALUES (?, ?)",
-            ("王五", user_wangwu),
+            "INSERT OR IGNORE INTO readers (name, age, gender, address, user_id) VALUES (?, ?, ?, ?, ?)",
+            ("王五", 22, "男", "深圳市南山区科技园南路99号", user_wangwu),
         )
         
         # Add reader without user account
         cur.execute(
-            "INSERT OR IGNORE INTO readers (name, user_id) VALUES (?, ?)",
-            ("赵六", None),
+            "INSERT OR IGNORE INTO readers (name, age, gender, address, user_id) VALUES (?, ?, ?, ?, ?)",
+            ("赵六", 30, "女", "杭州市西湖区文一路66号", None),
         )
 
         # Add rich book collection if database is empty
         if not cur.execute("SELECT 1 FROM books LIMIT 1").fetchone():
             books_data = [
-                # (ISBN, 书名, 作者, shelf_id, 总数, 可用数)
-                ("9787020002207", "红楼梦", "曹雪芹", shelf_d1, 5, 5),
-                ("9787020008735", "三国演义", "罗贯中", shelf_d1, 4, 4),
-                ("9787020015016", "西游记", "吴承恩", shelf_d1, 4, 4),
-                ("9787020015498", "水浒传", "施耐庵", shelf_d1, 3, 3),
-                ("9787115428028", "Python编程：从入门到实践", "Eric Matthes", shelf_c1, 8, 8),
-                ("9787111544937", "深入理解计算机系统", "Randal E. Bryant", shelf_c1, 6, 6),
-                ("9787115547996", "算法导论", "Thomas H. Cormen", shelf_c1, 5, 5),
-                ("9787111558422", "Java核心技术", "Cay S. Horstmann", shelf_c1, 7, 7),
-                ("9787115533623", "数据结构与算法分析", "Mark Allen Weiss", shelf_c1, 6, 6),
-                ("9787115293800", "JavaScript高级程序设计", "Nicholas C. Zakas", shelf_c1, 5, 5),
-                ("9780131103627", "The C Programming Language", "Brian W. Kernighan", shelf_b1, 4, 4),
-                ("9780596517748", "JavaScript: The Good Parts", "Douglas Crockford", shelf_b1, 3, 3),
-                ("9787506365437", "平凡的世界", "路遥", shelf_d1, 6, 6),
-                ("9787020125777", "活着", "余华", shelf_d1, 5, 5),
-                ("9787544270878", "追风筝的人", "卡勒德·胡赛尼", shelf_d1, 4, 4),
-                ("9787544291170", "解忧杂货店", "东野圭吾", shelf_d1, 5, 5),
-                ("9787115476210", "人工智能：一种现代方法", "Stuart Russell", shelf_c1, 4, 4),
-                ("9787302511359", "机器学习", "周志华", shelf_c1, 6, 6),
-                ("9787111641933", "深度学习", "Ian Goodfellow", shelf_c1, 5, 5),
-                ("9787115385376", "统计学习方法", "李航", shelf_c1, 5, 5),
-                ("9787030396051", "量子力学导论", "曾谨言", shelf_e1, 3, 3),
-                ("9787040396744", "普通物理学", "程守洙", shelf_e1, 5, 5),
-                ("9787040453638", "概率论与数理统计", "盛骤", shelf_e1, 6, 6),
-                ("9787040472233", "线性代数", "同济大学", shelf_e1, 7, 7),
-                ("9787111213826", "数据库系统概念", "Abraham Silberschatz", shelf_c1, 5, 5),
+                # (ISBN, 书名, 作者, 出版社, 出版日期, shelf_id, 总数, 可用数)
+                ("9787020002207", "红楼梦", "曹雪芹", "人民文学出版社", "1996-12-01", shelf_d1, 5, 5),
+                ("9787020008735", "三国演义", "罗贯中", "人民文学出版社", "1998-05-01", shelf_d1, 4, 4),
+                ("9787020015016", "西游记", "吴承恩", "人民文学出版社", "1999-01-01", shelf_d1, 4, 4),
+                ("9787020015498", "水浒传", "施耐庵", "人民文学出版社", "1997-01-01", shelf_d1, 3, 3),
+                ("9787115428028", "Python编程：从入门到实践", "Eric Matthes", "人民邮电出版社", "2016-07-01", shelf_c1, 8, 8),
+                ("9787111544937", "深入理解计算机系统", "Randal E. Bryant", "机械工业出版社", "2016-11-01", shelf_c1, 6, 6),
+                ("9787115547996", "算法导论", "Thomas H. Cormen", "人民邮电出版社", "2012-12-01", shelf_c1, 5, 5),
+                ("9787111558422", "Java核心技术", "Cay S. Horstmann", "机械工业出版社", "2017-01-01", shelf_c1, 7, 7),
+                ("9787115533623", "数据结构与算法分析", "Mark Allen Weiss", "人民邮电出版社", "2020-08-01", shelf_c1, 6, 6),
+                ("9787115293800", "JavaScript高级程序设计", "Nicholas C. Zakas", "人民邮电出版社", "2012-03-01", shelf_c1, 5, 5),
+                ("9780131103627", "The C Programming Language", "Brian W. Kernighan", "Prentice Hall", "1988-04-01", shelf_b1, 4, 4),
+                ("9780596517748", "JavaScript: The Good Parts", "Douglas Crockford", "O'Reilly Media", "2008-05-01", shelf_b1, 3, 3),
+                ("9787506365437", "平凡的世界", "路遥", "北京十月文艺出版社", "2012-03-01", shelf_d1, 6, 6),
+                ("9787020125777", "活着", "余华", "人民文学出版社", "2017-04-01", shelf_d1, 5, 5),
+                ("9787544270878", "追风筝的人", "卡勒德·胡赛尼", "上海人民出版社", "2006-05-01", shelf_d1, 4, 4),
+                ("9787544291170", "解忧杂货店", "东野圭吾", "南海出版公司", "2014-05-01", shelf_d1, 5, 5),
+                ("9787115476210", "人工智能：一种现代方法", "Stuart Russell", "人民邮电出版社", "2018-05-01", shelf_c1, 4, 4),
+                ("9787302511359", "机器学习", "周志华", "清华大学出版社", "2019-01-01", shelf_c1, 6, 6),
+                ("9787111641933", "深度学习", "Ian Goodfellow", "机械工业出版社", "2019-11-01", shelf_c1, 5, 5),
+                ("9787115385376", "统计学习方法", "李航", "人民邮电出版社", "2015-03-01", shelf_c1, 5, 5),
+                ("9787030396051", "量子力学导论", "曾谨言", "科学出版社", "2013-05-01", shelf_e1, 3, 3),
+                ("9787040396744", "普通物理学", "程守洙", "高等教育出版社", "2013-06-01", shelf_e1, 5, 5),
+                ("9787040453638", "概率论与数理统计", "盛骤", "高等教育出版社", "2016-06-01", shelf_e1, 6, 6),
+                ("9787040472233", "线性代数", "同济大学", "高等教育出版社", "2017-03-01", shelf_e1, 7, 7),
+                ("9787111213826", "数据库系统概念", "Abraham Silberschatz", "机械工业出版社", "2007-03-01", shelf_c1, 5, 5),
             ]
             
             for book_data in books_data:
                 cur.execute(
                     """
-                    INSERT INTO books (isbn, title, author, shelf_id, total_copies, available_copies)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO books (isbn, title, author, publisher, publication_date, shelf_id, total_copies, available_copies)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     book_data,
                 )
@@ -360,6 +367,8 @@ class LibrarySystem:
         title: str,
         author: Optional[str],
         isbn: Optional[str],
+        publisher: Optional[str] = None,
+        publication_date: Optional[str] = None,
         shelf_code: Optional[str],
         total_copies: int,
         shelf_location: Optional[str] = None,
@@ -373,10 +382,10 @@ class LibrarySystem:
         cur = self.conn.cursor()
         cur.execute(
             """
-            INSERT INTO books (isbn, title, author, shelf_id, total_copies, available_copies)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO books (isbn, title, author, publisher, publication_date, shelf_id, total_copies, available_copies)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (isbn, title, author, shelf_id, total_copies, total_copies),
+            (isbn, title, author, publisher, publication_date, shelf_id, total_copies, total_copies),
         )
         self.conn.commit()
         return int(cur.lastrowid)
@@ -389,6 +398,8 @@ class LibrarySystem:
         title: Optional[str] = None,
         author: Optional[str] = None,
         isbn: Optional[str] = None,
+        publisher: Optional[str] = None,
+        publication_date: Optional[str] = None,
         shelf_code: Optional[str] = None,
         shelf_location: Optional[str] = None,
         total_copies: Optional[int] = None,
@@ -406,6 +417,12 @@ class LibrarySystem:
         if isbn is not None:
             fields.append("isbn = ?")
             params.append(isbn)
+        if publisher is not None:
+            fields.append("publisher = ?")
+            params.append(publisher)
+        if publication_date is not None:
+            fields.append("publication_date = ?")
+            params.append(publication_date)
         if shelf_code is not None:
             shelf_id = self._get_or_create_shelf(shelf_code, shelf_location)
             fields.append("shelf_id = ?")
@@ -448,7 +465,7 @@ class LibrarySystem:
         cur = self.conn.cursor()
         rows = cur.execute(
             """
-            SELECT readers.id, readers.name, users.username, users.role
+            SELECT readers.id, readers.name, readers.age, readers.gender, readers.address, users.username, users.role
             FROM readers
             LEFT JOIN users ON users.id = readers.user_id
             ORDER BY readers.id
@@ -461,6 +478,9 @@ class LibrarySystem:
         user: sqlite3.Row,
         *,
         name: str,
+        age: Optional[int] = None,
+        gender: Optional[str] = None,
+        address: Optional[str] = None,
         username: Optional[str] = None,
         password: Optional[str] = None,
     ) -> int:
@@ -478,7 +498,8 @@ class LibrarySystem:
                 raise ValueError("该用户名已存在")
             user_id = self._insert_user_if_missing(username, password, "borrower")
         cur.execute(
-            "INSERT INTO readers (name, user_id) VALUES (?, ?)", (name, user_id)
+            "INSERT INTO readers (name, age, gender, address, user_id) VALUES (?, ?, ?, ?, ?)", 
+            (name, age, gender, address, user_id)
         )
         self.conn.commit()
         return int(cur.lastrowid)
@@ -489,12 +510,31 @@ class LibrarySystem:
         reader_id: int,
         *,
         name: Optional[str] = None,
+        age: Optional[int] = None,
+        gender: Optional[str] = None,
+        address: Optional[str] = None,
     ) -> None:
         self._require_role(user, ("admin",))
-        if name is None:
+        fields = []
+        params: List[Any] = []
+        if name is not None:
+            fields.append("name = ?")
+            params.append(name)
+        if age is not None:
+            fields.append("age = ?")
+            params.append(age)
+        if gender is not None:
+            fields.append("gender = ?")
+            params.append(gender)
+        if address is not None:
+            fields.append("address = ?")
+            params.append(address)
+        if not fields:
             return
+        params.append(reader_id)
         cur = self.conn.cursor()
-        cur.execute("UPDATE readers SET name = ? WHERE id = ?", (name, reader_id))
+        query = "UPDATE readers SET " + ", ".join(fields) + " WHERE id = ?"
+        cur.execute(query, params)
         self.conn.commit()
 
     def delete_reader(self, user: sqlite3.Row, reader_id: int) -> None:
