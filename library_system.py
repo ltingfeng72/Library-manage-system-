@@ -373,13 +373,15 @@ class LibrarySystem:
     # ----------------------------------------------------------- borrow ops
     def list_borrows(self, user: sqlite3.Row) -> List[Dict[str, Any]]:
         cur = self.conn.cursor()
+        # Use consistent column selection for all queries
+        columns = "borrow_id, book_id, book_title, book_author, reader_name, reader_id, borrowed_at, returned_at"
         if user["role"] == "borrower":
             reader_id = self._get_reader_id_for_user(user["id"])
             if reader_id is None:
                 return []
             rows = cur.execute(
-                """
-                SELECT borrow_id, book_id, book_title, book_author, reader_name, borrowed_at, returned_at
+                f"""
+                SELECT {columns}
                 FROM v_borrow_history
                 WHERE reader_id = ?
                 ORDER BY borrow_id DESC
@@ -388,7 +390,7 @@ class LibrarySystem:
             ).fetchall()
         else:
             rows = cur.execute(
-                "SELECT * FROM v_borrow_history ORDER BY borrow_id DESC"
+                f"SELECT {columns} FROM v_borrow_history ORDER BY borrow_id DESC"
             ).fetchall()
         return [dict(row) for row in rows]
 

@@ -157,6 +157,10 @@ class LoginApp:
             self._load_data(self.current_user)
             self.status_var.set(f"✅ 数据已刷新 ({self.current_user['username']})")
 
+    def _format_date(self, datetime_str: str) -> str:
+        """Format ISO datetime string to display date only"""
+        return datetime_str.split('T')[0] if 'T' in datetime_str else datetime_str
+
     def _load_data(self, user: sqlite3.Row) -> None:
         try:
             books = self.system.list_books()
@@ -213,27 +217,27 @@ class LoginApp:
                 self.text.insert(tk.END, "  暂无借阅记录\n")
             else:
                 for r in borrows:
-                    # Use book_title instead of title, handle both for compatibility
-                    book_title = r.get('book_title') or r.get('title', '未知书名')
-                    book_author = r.get('book_author', '未知作者')
+                    # Use book_title instead of title for consistency
+                    book_title = r.get('book_title') or r.get('title') or '未知书名'
+                    book_author = r.get('book_author') or r.get('author') or '未知作者'
                     
                     borrow_info = (
                         f"记录ID: {r['borrow_id']:3d} | "
                         f"图书: {book_title:<25s} "
                     )
                     
-                    # Add author if available and not None
-                    if book_author and book_author != '未知作者':
+                    # Add author if available and not default value
+                    if book_author != '未知作者':
                         borrow_info += f"({book_author}) "
                     
                     borrow_info += f"| 读者: {r['reader_name']:<15s}\n"
                     self.text.insert(tk.END, borrow_info)
                     
                     # Format datetime for display
-                    borrowed_time = r['borrowed_at'].split('T')[0] if 'T' in r['borrowed_at'] else r['borrowed_at']
+                    borrowed_time = self._format_date(r['borrowed_at'])
                     
                     if r["returned_at"]:
-                        returned_time = r['returned_at'].split('T')[0] if 'T' in r['returned_at'] else r['returned_at']
+                        returned_time = self._format_date(r['returned_at'])
                         status_info = f"       借出: {borrowed_time} | 归还: {returned_time} | 状态: ✅ 已归还\n"
                         tag = "returned"
                     else:
