@@ -397,19 +397,25 @@ class EnhancedLoginApp:
             return
         
         try:
+            copies_str = self.book_copies_var.get().strip()
+            copies = int(copies_str) if copies_str else 1
+            if copies < 1:
+                messagebox.showwarning("提示", "库存数量必须大于0")
+                return
+            
             book_id = self.system.add_book(
                 self.current_user,
                 title=title,
                 author=self.book_author_var.get().strip() or None,
                 isbn=self.book_isbn_var.get().strip() or None,
                 shelf_code=self.book_shelf_var.get().strip() or None,
-                total_copies=int(self.book_copies_var.get() or 1)
+                total_copies=copies
             )
             messagebox.showinfo("成功", f"图书添加成功！ID: {book_id}")
             self.clear_book_form()
             self.refresh_books()
         except ValueError as e:
-            messagebox.showerror("错误", str(e))
+            messagebox.showerror("错误", f"输入错误：{str(e)}\n请确保库存数量为有效数字")
         except Exception as e:
             messagebox.showerror("错误", f"添加图书失败: {str(e)}")
 
@@ -423,20 +429,29 @@ class EnhancedLoginApp:
             return
         
         try:
+            book_id_int = int(book_id)
+            copies = None
+            copies_str = self.book_copies_var.get().strip()
+            if copies_str:
+                copies = int(copies_str)
+                if copies < 1:
+                    messagebox.showwarning("提示", "库存数量必须大于0")
+                    return
+            
             self.system.update_book(
                 self.current_user,
-                int(book_id),
+                book_id_int,
                 title=self.book_title_var.get().strip() or None,
                 author=self.book_author_var.get().strip() or None,
                 isbn=self.book_isbn_var.get().strip() or None,
                 shelf_code=self.book_shelf_var.get().strip() or None,
-                total_copies=int(self.book_copies_var.get()) if self.book_copies_var.get() else None
+                total_copies=copies
             )
             messagebox.showinfo("成功", "图书信息已更新！")
             self.clear_book_form()
             self.refresh_books()
         except ValueError as e:
-            messagebox.showerror("错误", str(e))
+            messagebox.showerror("错误", f"输入错误：{str(e)}\n请确保ID和库存数量为有效数字")
         except Exception as e:
             messagebox.showerror("错误", f"更新图书失败: {str(e)}")
 
@@ -484,13 +499,20 @@ class EnhancedLoginApp:
             self.book_author_var.set(values[2] if values[2] != 'N/A' else '')
             self.book_isbn_var.set(values[3] if values[3] != 'N/A' else '')
             self.book_shelf_var.set(values[4] if values[4] != 'N/A' else '')
-            # Parse stock info (e.g., "3/5")
+            # Parse stock info (e.g., "3/5"), more robust handling
             stock_str = str(values[5])
-            if '/' in stock_str:
-                stock = stock_str.split('/')[1]
-            else:
-                stock = stock_str
-            self.book_copies_var.set(stock)
+            try:
+                if '/' in stock_str:
+                    parts = stock_str.split('/')
+                    if len(parts) >= 2:
+                        stock = parts[1]
+                    else:
+                        stock = stock_str
+                else:
+                    stock = stock_str
+                self.book_copies_var.set(stock)
+            except (IndexError, ValueError):
+                self.book_copies_var.set("1")
 
     # Reader operations
     def add_reader(self) -> None:
@@ -807,8 +829,14 @@ class EnhancedLoginApp:
         try:
             dt = datetime.fromisoformat(datetime_str.replace('Z', '+00:00'))
             return dt.strftime('%Y-%m-%d')
-        except (ValueError, AttributeError):
-            return datetime_str.split('T')[0] if 'T' in datetime_str else datetime_str
+        except (ValueError, AttributeError, TypeError):
+            # Fallback: simple split for backward compatibility
+            try:
+                if isinstance(datetime_str, str) and 'T' in datetime_str:
+                    return datetime_str.split('T')[0]
+                return str(datetime_str) if datetime_str else "N/A"
+            except (AttributeError, TypeError):
+                return "N/A"
 
     def _check_permission(self, allowed_roles: list, show_error: bool = True) -> bool:
         """Check if current user has permission"""
