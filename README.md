@@ -26,23 +26,30 @@
 ### 常用命令示例
 ```bash
 # 查看库存（任何角色均可）
-python main.py --username reader --password reader123 list-books
+python main.py --username reader --password 'Reader!2345' list-books
 
 # 管理员新增图书
-python main.py --username admin --password admin123 add-book --title "数据库原理" --author "教学组" --copies 2 --shelf-code A2
+python main.py --username admin --password 'Admin!2345' add-book --title "数据库原理" --author "教学组" --copies 2 --shelf-code A2
 
 # 管理员查看读者列表
-python main.py --username admin --password admin123 list-readers
+python main.py --username admin --password 'Admin!2345' list-readers
 
 # 操作员为读者借书（reader_id 可从 list-readers 获取）
-python main.py --username operator --password operator123 borrow --book-id 1 --reader-id 1
+python main.py --username operator --password 'Operator!2345' borrow --book-id 1 --reader-id 1
 
 # 操作员归还图书
-python main.py --username operator --password operator123 return --borrow-id 1
+python main.py --username operator --password 'Operator!2345' return --borrow-id 1
 
 # 读者查看自己的借阅历史（基于视图）
-python main.py --username reader --password reader123 list-borrows
+python main.py --username reader --password 'Reader!2345' list-borrows
 ```
+
+## 图形登录界面（可选）
+需要本机支持图形环境（Windows/macOS 默认可用）。运行：
+```bash
+python login_gui.py
+```
+输入用户名、密码后会显示库存列表与借阅记录。账户默认同上（admin/operator/reader）。
 
 ## 数据结构概览
 - `users`：登录账户（字段：username、password、role）
