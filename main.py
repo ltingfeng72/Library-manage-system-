@@ -65,8 +65,8 @@ def main() -> None:
 
     add_reader = sub.add_parser("add-reader", help="新增读者（管理员）")
     add_reader.add_argument("--name", required=True)
-    add_reader.add_argument("--username")
-    add_reader.add_argument("--password")
+    add_reader.add_argument("--reader-username", dest="reader_username")
+    add_reader.add_argument("--reader-password", dest="reader_password")
 
     update_reader = sub.add_parser("update-reader", help="修改读者（管理员）")
     update_reader.add_argument("--reader-id", type=int, required=True)
@@ -127,13 +127,13 @@ def main() -> None:
         elif args.command == "list-readers":
             _print_rows(system.list_readers(user))
         elif args.command == "add-reader":
-            password = args.password
-            if args.username and not password:
+            password = args.reader_password
+            if args.reader_username and not password:
                 password = getpass.getpass("New user password: ")
             reader_id = system.add_reader(
                 user,
                 name=args.name,
-                username=args.username,
+                username=args.reader_username,
                 password=password,
             )
             print(f"新增读者成功，ID={reader_id}")

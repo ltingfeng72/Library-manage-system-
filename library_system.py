@@ -85,7 +85,9 @@ class LibrarySystem:
             CREATE VIEW v_borrow_history AS
                 SELECT
                     borrows.id AS borrow_id,
-                    books.title,
+                    books.id AS book_id,
+                    books.title AS book_title,
+                    books.author AS book_author,
                     readers.name AS reader_name,
                     readers.id AS reader_id,
                     borrows.borrowed_at,
@@ -377,7 +379,7 @@ class LibrarySystem:
                 return []
             rows = cur.execute(
                 """
-                SELECT borrow_id, title, reader_name, borrowed_at, returned_at
+                SELECT borrow_id, book_id, book_title, book_author, reader_name, borrowed_at, returned_at
                 FROM v_borrow_history
                 WHERE reader_id = ?
                 ORDER BY borrow_id DESC

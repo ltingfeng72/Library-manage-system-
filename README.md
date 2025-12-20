@@ -34,11 +34,17 @@ python main.py --username admin --password 'Admin!2345' add-book --title "数据
 # 管理员查看读者列表
 python main.py --username admin --password 'Admin!2345' list-readers
 
+# 管理员新增读者（带登录账户）
+python main.py --username admin --password 'Admin!2345' add-reader --name "新读者" --reader-username "new_user" --reader-password "NewUser!2345"
+
 # 操作员为读者借书（reader_id 可从 list-readers 获取）
 python main.py --username operator --password 'Operator!2345' borrow --book-id 1 --reader-id 1
 
 # 操作员归还图书
 python main.py --username operator --password 'Operator!2345' return --borrow-id 1
+
+# 查看借阅历史（操作员可查看所有记录，读者仅能查看自己的记录）
+python main.py --username operator --password 'Operator!2345' list-borrows
 
 # 读者查看自己的借阅历史（基于视图）
 python main.py --username reader --password 'Reader!2345' list-borrows
@@ -49,7 +55,20 @@ python main.py --username reader --password 'Reader!2345' list-borrows
 ```bash
 python login_gui.py
 ```
-输入用户名、密码后会显示库存列表与借阅记录。账户默认同上（admin/operator/reader）。
+
+登录后可查看：
+- 📚 **图书库存列表** - 显示所有图书的详细信息（ID、书名、作者、ISBN、书架位置、库存状态）
+- 📋 **借阅记录** - 显示借阅历史（包括图书名称、作者、读者姓名、借阅时间、归还状态）
+- 支持登录后刷新数据
+- 支持退出登录切换账户
+
+账户默认同上（admin/operator/reader）。
+
+**界面特性：**
+- 优化的用户体验，支持Enter键快速登录
+- 彩色状态显示（可用/借出/已归还）
+- 详细的错误提示和状态信息
+- 可调整窗口大小，支持滚动查看
 
 ## 数据结构概览
 - `users`：登录账户（字段：username、password、role）
@@ -59,6 +78,38 @@ python login_gui.py
 - `borrows`：借阅记录（借出、归还时间）
 - 视图：
   - `v_book_inventory`：图书库存总览
-  - `v_borrow_history`：借阅历史（含 reader_id，供权限过滤）
+  - `v_borrow_history`：借阅历史（含 book_id、book_title、book_author、reader_id、reader_name，供权限过滤）
 
 > 所有操作均使用参数化 SQL，且启用 `PRAGMA foreign_keys=ON` 以保证引用完整性。
+
+## 功能完善情况
+
+### ✅ 已实现功能
+1. **登录界面优化**
+   - 改进的图形界面，支持Enter键登录
+   - 更好的错误提示和状态显示
+   - 登录/退出/刷新功能
+   - 彩色状态标识和格式化输出
+
+2. **图书CRUD操作**
+   - ✅ 新增图书（支持书名、作者、ISBN、书架、库存数量）
+   - ✅ 修改图书信息
+   - ✅ 删除图书（需确保无未归还记录）
+   - ✅ 查询图书列表
+
+3. **读者CRUD操作**
+   - ✅ 新增读者（可选择是否创建登录账户）
+   - ✅ 修改读者信息
+   - ✅ 删除读者（需确保无未归还记录）
+   - ✅ 查询读者列表
+
+4. **借阅管理**
+   - ✅ 借书操作（自动扣减库存）
+   - ✅ 还书操作（自动增加库存）
+   - ✅ 借阅记录查询（包含图书名称、作者信息）
+   - ✅ 按权限过滤记录（读者只能查看自己的记录）
+
+5. **数据增强**
+   - ✅ 借阅记录包含完整图书信息（ID、书名、作者）
+   - ✅ 借阅记录包含读者信息
+   - ✅ 支持时间戳记录借阅和归还时间
