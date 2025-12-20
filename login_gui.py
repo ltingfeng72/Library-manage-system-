@@ -1,5 +1,6 @@
 import sqlite3
 import tkinter as tk
+from datetime import datetime
 from tkinter import ttk, messagebox, font
 
 from library_system import LibrarySystem
@@ -158,8 +159,24 @@ class LoginApp:
             self.status_var.set(f"✅ 数据已刷新 ({self.current_user['username']})")
 
     def _format_date(self, datetime_str: str) -> str:
-        """Format ISO datetime string to display date only"""
-        return datetime_str.split('T')[0] if 'T' in datetime_str else datetime_str
+        """Format ISO datetime string to display date only
+        
+        Args:
+            datetime_str: ISO format datetime string
+            
+        Returns:
+            Date string in YYYY-MM-DD format
+        """
+        if not datetime_str:
+            return "N/A"
+        
+        try:
+            # Try to parse as ISO format and extract date
+            dt = datetime.fromisoformat(datetime_str.replace('Z', '+00:00'))
+            return dt.strftime('%Y-%m-%d')
+        except (ValueError, AttributeError):
+            # Fallback: simple split for backward compatibility
+            return datetime_str.split('T')[0] if 'T' in datetime_str else datetime_str
 
     def _load_data(self, user: sqlite3.Row) -> None:
         try:
