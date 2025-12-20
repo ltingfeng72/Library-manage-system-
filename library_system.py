@@ -103,33 +103,172 @@ class LibrarySystem:
 
     def _ensure_sample_data(self) -> None:
         cur = self.conn.cursor()
+        # Create default users
         _ = self._insert_user_if_missing("admin", "Admin!2345", "admin")
         _ = self._insert_user_if_missing("operator", "Operator!2345", "operator")
         borrower_id = self._insert_user_if_missing("reader", "Reader!2345", "borrower")
+        
+        # Create additional user accounts for readers
+        user_zhangsan = self._insert_user_if_missing("zhangsan", "Zhang!2345", "borrower")
+        user_lisi = self._insert_user_if_missing("lisi", "Lisi!2345", "borrower")
+        user_wangwu = self._insert_user_if_missing("wangwu", "Wang!2345", "borrower")
 
-        main_shelf = self._get_or_create_shelf("A1", "综合区")
-        _ = self._get_or_create_shelf("B1", "外文区")
+        # Create shelves
+        shelf_a1 = self._get_or_create_shelf("A1", "综合区")
+        shelf_b1 = self._get_or_create_shelf("B1", "外文区")
+        shelf_c1 = self._get_or_create_shelf("C1", "计算机区")
+        shelf_d1 = self._get_or_create_shelf("D1", "文学区")
+        shelf_e1 = self._get_or_create_shelf("E1", "科学区")
 
+        # Create readers
         cur.execute(
             "INSERT OR IGNORE INTO readers (name, user_id) VALUES (?, ?)",
             ("示例读者", borrower_id),
         )
+        
+        # Get or create reader IDs
+        reader1_id = cur.execute(
+            "SELECT id FROM readers WHERE name = ?", ("示例读者",)
+        ).fetchone()[0]
+        
+        # Add more readers with user accounts
+        cur.execute(
+            "INSERT OR IGNORE INTO readers (name, user_id) VALUES (?, ?)",
+            ("张三", user_zhangsan),
+        )
+        cur.execute(
+            "INSERT OR IGNORE INTO readers (name, user_id) VALUES (?, ?)",
+            ("李四", user_lisi),
+        )
+        cur.execute(
+            "INSERT OR IGNORE INTO readers (name, user_id) VALUES (?, ?)",
+            ("王五", user_wangwu),
+        )
+        
+        # Add reader without user account
+        cur.execute(
+            "INSERT OR IGNORE INTO readers (name, user_id) VALUES (?, ?)",
+            ("赵六", None),
+        )
 
+        # Add rich book collection if database is empty
         if not cur.execute("SELECT 1 FROM books LIMIT 1").fetchone():
-            cur.execute(
-                """
-                INSERT INTO books (isbn, title, author, shelf_id, total_copies, available_copies)
-                VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    "9787020000000",
-                    "示例图书",
-                    "佚名",
-                    main_shelf,
-                    3,
-                    3,
-                ),
-            )
+            books_data = [
+                # (ISBN, 书名, 作者, shelf_id, 总数, 可用数)
+                ("9787020002207", "红楼梦", "曹雪芹", shelf_d1, 5, 5),
+                ("9787020008735", "三国演义", "罗贯中", shelf_d1, 4, 4),
+                ("9787020015016", "西游记", "吴承恩", shelf_d1, 4, 4),
+                ("9787020015498", "水浒传", "施耐庵", shelf_d1, 3, 3),
+                ("9787115428028", "Python编程：从入门到实践", "Eric Matthes", shelf_c1, 8, 8),
+                ("9787111544937", "深入理解计算机系统", "Randal E. Bryant", shelf_c1, 6, 6),
+                ("9787115547996", "算法导论", "Thomas H. Cormen", shelf_c1, 5, 5),
+                ("9787111558422", "Java核心技术", "Cay S. Horstmann", shelf_c1, 7, 7),
+                ("9787115533623", "数据结构与算法分析", "Mark Allen Weiss", shelf_c1, 6, 6),
+                ("9787115293800", "JavaScript高级程序设计", "Nicholas C. Zakas", shelf_c1, 5, 5),
+                ("9780131103627", "The C Programming Language", "Brian W. Kernighan", shelf_b1, 4, 4),
+                ("9780596517748", "JavaScript: The Good Parts", "Douglas Crockford", shelf_b1, 3, 3),
+                ("9787506365437", "平凡的世界", "路遥", shelf_d1, 6, 6),
+                ("9787020125777", "活着", "余华", shelf_d1, 5, 5),
+                ("9787544270878", "追风筝的人", "卡勒德·胡赛尼", shelf_d1, 4, 4),
+                ("9787544291170", "解忧杂货店", "东野圭吾", shelf_d1, 5, 5),
+                ("9787115476210", "人工智能：一种现代方法", "Stuart Russell", shelf_c1, 4, 4),
+                ("9787302511359", "机器学习", "周志华", shelf_c1, 6, 6),
+                ("9787111641933", "深度学习", "Ian Goodfellow", shelf_c1, 5, 5),
+                ("9787115385376", "统计学习方法", "李航", shelf_c1, 5, 5),
+                ("9787030396051", "量子力学导论", "曾谨言", shelf_e1, 3, 3),
+                ("9787040396744", "普通物理学", "程守洙", shelf_e1, 5, 5),
+                ("9787040453638", "概率论与数理统计", "盛骤", shelf_e1, 6, 6),
+                ("9787040472233", "线性代数", "同济大学", shelf_e1, 7, 7),
+                ("9787111213826", "数据库系统概念", "Abraham Silberschatz", shelf_c1, 5, 5),
+            ]
+            
+            for book_data in books_data:
+                cur.execute(
+                    """
+                    INSERT INTO books (isbn, title, author, shelf_id, total_copies, available_copies)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    book_data,
+                )
+        
+        # Add sample borrowing records if none exist
+        if not cur.execute("SELECT 1 FROM borrows LIMIT 1").fetchone():
+            # Get book and reader IDs
+            books = cur.execute("SELECT id FROM books ORDER BY id LIMIT 10").fetchall()
+            readers = cur.execute("SELECT id FROM readers ORDER BY id").fetchall()
+            
+            if books and readers:
+                # Add some borrowing records with different statuses
+                from datetime import datetime, timezone, timedelta
+                
+                now = datetime.now(timezone.utc)
+                
+                # Borrow record 1: Returned (borrowed 30 days ago, returned 25 days ago)
+                if len(books) > 0 and len(readers) > 0:
+                    borrowed_time = (now - timedelta(days=30)).isoformat()
+                    returned_time = (now - timedelta(days=25)).isoformat()
+                    cur.execute(
+                        "INSERT INTO borrows (book_id, reader_id, borrowed_at, returned_at) VALUES (?, ?, ?, ?)",
+                        (books[0][0], readers[0][0], borrowed_time, returned_time)
+                    )
+                
+                # Borrow record 2: Currently borrowed (borrowed 15 days ago)
+                if len(books) > 1 and len(readers) > 1:
+                    borrowed_time = (now - timedelta(days=15)).isoformat()
+                    cur.execute(
+                        "INSERT INTO borrows (book_id, reader_id, borrowed_at, returned_at) VALUES (?, ?, ?, ?)",
+                        (books[1][0], readers[1][0], borrowed_time, None)
+                    )
+                    # Update book availability
+                    cur.execute(
+                        "UPDATE books SET available_copies = available_copies - 1 WHERE id = ?",
+                        (books[1][0],)
+                    )
+                
+                # Borrow record 3: Returned (borrowed 20 days ago, returned 10 days ago)
+                if len(books) > 2 and len(readers) > 2:
+                    borrowed_time = (now - timedelta(days=20)).isoformat()
+                    returned_time = (now - timedelta(days=10)).isoformat()
+                    cur.execute(
+                        "INSERT INTO borrows (book_id, reader_id, borrowed_at, returned_at) VALUES (?, ?, ?, ?)",
+                        (books[2][0], readers[2][0], borrowed_time, returned_time)
+                    )
+                
+                # Borrow record 4: Currently borrowed (borrowed 7 days ago)
+                if len(books) > 3 and len(readers) > 3:
+                    borrowed_time = (now - timedelta(days=7)).isoformat()
+                    cur.execute(
+                        "INSERT INTO borrows (book_id, reader_id, borrowed_at, returned_at) VALUES (?, ?, ?, ?)",
+                        (books[3][0], readers[3][0], borrowed_time, None)
+                    )
+                    # Update book availability
+                    cur.execute(
+                        "UPDATE books SET available_copies = available_copies - 1 WHERE id = ?",
+                        (books[3][0],)
+                    )
+                
+                # Borrow record 5: Currently borrowed (borrowed 3 days ago)
+                if len(books) > 4 and len(readers) > 0:
+                    borrowed_time = (now - timedelta(days=3)).isoformat()
+                    cur.execute(
+                        "INSERT INTO borrows (book_id, reader_id, borrowed_at, returned_at) VALUES (?, ?, ?, ?)",
+                        (books[4][0], readers[0][0], borrowed_time, None)
+                    )
+                    # Update book availability
+                    cur.execute(
+                        "UPDATE books SET available_copies = available_copies - 1 WHERE id = ?",
+                        (books[4][0],)
+                    )
+                
+                # Borrow record 6: Returned (borrowed 60 days ago, returned 55 days ago)
+                if len(books) > 5 and len(readers) > 1:
+                    borrowed_time = (now - timedelta(days=60)).isoformat()
+                    returned_time = (now - timedelta(days=55)).isoformat()
+                    cur.execute(
+                        "INSERT INTO borrows (book_id, reader_id, borrowed_at, returned_at) VALUES (?, ?, ?, ?)",
+                        (books[5][0], readers[1][0], borrowed_time, returned_time)
+                    )
+        
         self.conn.commit()
 
     # ---------------------------------------------------------------- auth
