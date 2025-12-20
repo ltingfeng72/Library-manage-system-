@@ -267,14 +267,10 @@ class EnhancedLoginApp:
                 self.reader_tree.column(col, width=200)
             elif col == "姓名":
                 self.reader_tree.column(col, width=100)
+            elif col == "用户名":
+                self.reader_tree.column(col, width=100)
             else:
                 self.reader_tree.column(col, width=80)
-            if col == "姓名":
-                self.reader_tree.column(col, width=150)
-            elif col == "用户名":
-                self.reader_tree.column(col, width=150)
-            else:
-                self.reader_tree.column(col, width=100)
 
         self.reader_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.reader_tree.bind('<Double-Button-1>', self.on_reader_select)
