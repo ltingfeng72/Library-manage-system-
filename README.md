@@ -50,6 +50,8 @@ python main.py --username operator --password 'Operator!2345' list-borrows
 python main.py --username reader --password 'Reader!2345' list-borrows
 ```
 
+> 📖 **详细使用指南**: 查看 [USAGE_GUIDE.md](USAGE_GUIDE.md) 了解登录后如何进行各种操作，包括完整的命令示例和操作流程。
+
 ## 图形登录界面（可选）
 需要本机支持图形环境（Windows/macOS 默认可用）。运行：
 ```bash
@@ -69,6 +71,8 @@ python login_gui.py
 - 彩色状态显示（可用/借出/已归还）
 - 详细的错误提示和状态信息
 - 可调整窗口大小，支持滚动查看
+
+> ⚠️ **注意**: 图形界面当前仅支持查看功能。如需进行图书管理、读者管理、借书还书等操作，请使用命令行界面。详见 [USAGE_GUIDE.md](USAGE_GUIDE.md)。
 
 ## 数据结构概览
 - `users`：登录账户（字段：username、password、role）
