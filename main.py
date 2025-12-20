@@ -45,6 +45,8 @@ def main() -> None:
     add_book.add_argument("--title", required=True)
     add_book.add_argument("--author")
     add_book.add_argument("--isbn")
+    add_book.add_argument("--publisher")
+    add_book.add_argument("--publication-date")
     add_book.add_argument("--shelf-code")
     add_book.add_argument("--shelf-location")
     add_book.add_argument("--copies", type=int, default=1)
@@ -54,6 +56,8 @@ def main() -> None:
     update_book.add_argument("--title")
     update_book.add_argument("--author")
     update_book.add_argument("--isbn")
+    update_book.add_argument("--publisher")
+    update_book.add_argument("--publication-date")
     update_book.add_argument("--shelf-code")
     update_book.add_argument("--shelf-location")
     update_book.add_argument("--copies", type=int)
@@ -65,12 +69,18 @@ def main() -> None:
 
     add_reader = sub.add_parser("add-reader", help="新增读者（管理员）")
     add_reader.add_argument("--name", required=True)
+    add_reader.add_argument("--age", type=int)
+    add_reader.add_argument("--gender")
+    add_reader.add_argument("--address")
     add_reader.add_argument("--reader-username", dest="reader_username")
     add_reader.add_argument("--reader-password", dest="reader_password")
 
     update_reader = sub.add_parser("update-reader", help="修改读者（管理员）")
     update_reader.add_argument("--reader-id", type=int, required=True)
     update_reader.add_argument("--name")
+    update_reader.add_argument("--age", type=int)
+    update_reader.add_argument("--gender")
+    update_reader.add_argument("--address")
 
     delete_reader = sub.add_parser("delete-reader", help="删除读者（管理员）")
     delete_reader.add_argument("--reader-id", type=int, required=True)
@@ -104,6 +114,8 @@ def main() -> None:
                 title=args.title,
                 author=args.author,
                 isbn=args.isbn,
+                publisher=getattr(args, 'publisher', None),
+                publication_date=getattr(args, 'publication_date', None),
                 shelf_code=args.shelf_code,
                 shelf_location=args.shelf_location,
                 total_copies=args.copies,
@@ -116,6 +128,8 @@ def main() -> None:
                 title=args.title,
                 author=args.author,
                 isbn=args.isbn,
+                publisher=getattr(args, 'publisher', None),
+                publication_date=getattr(args, 'publication_date', None),
                 shelf_code=args.shelf_code,
                 shelf_location=args.shelf_location,
                 total_copies=args.copies,
@@ -133,12 +147,22 @@ def main() -> None:
             reader_id = system.add_reader(
                 user,
                 name=args.name,
+                age=getattr(args, 'age', None),
+                gender=getattr(args, 'gender', None),
+                address=getattr(args, 'address', None),
                 username=args.reader_username,
                 password=password,
             )
             print(f"新增读者成功，ID={reader_id}")
         elif args.command == "update-reader":
-            system.update_reader(user, args.reader_id, name=args.name)
+            system.update_reader(
+                user, 
+                args.reader_id, 
+                name=args.name,
+                age=getattr(args, 'age', None),
+                gender=getattr(args, 'gender', None),
+                address=getattr(args, 'address', None)
+            )
             print("读者信息已更新")
         elif args.command == "delete-reader":
             system.delete_reader(user, args.reader_id)

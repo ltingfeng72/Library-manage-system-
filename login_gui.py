@@ -220,6 +220,10 @@ class LoginApp:
                     
                     if b.get('isbn'):
                         self.text.insert(tk.END, f"       ISBN: {b['isbn']}\n")
+                    if b.get('publisher'):
+                        self.text.insert(tk.END, f"       出版社: {b['publisher']}\n")
+                    if b.get('publication_date'):
+                        self.text.insert(tk.END, f"       出版日期: {b['publication_date']}\n")
                     self.text.insert(tk.END, "\n")
             else:
                 self.text.insert(tk.END, "  暂无图书记录\n\n")
