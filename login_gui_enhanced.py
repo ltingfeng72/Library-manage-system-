@@ -1,7 +1,6 @@
-import sqlite3
 import tkinter as tk
 from datetime import datetime
-from tkinter import ttk, messagebox, font, simpledialog
+from tkinter import ttk, messagebox, font
 
 from library_system import LibrarySystem
 
@@ -486,7 +485,11 @@ class EnhancedLoginApp:
             self.book_isbn_var.set(values[3] if values[3] != 'N/A' else '')
             self.book_shelf_var.set(values[4] if values[4] != 'N/A' else '')
             # Parse stock info (e.g., "3/5")
-            stock = str(values[5]).split('/')[1] if '/' in str(values[5]) else values[5]
+            stock_str = str(values[5])
+            if '/' in stock_str:
+                stock = stock_str.split('/')[1]
+            else:
+                stock = stock_str
             self.book_copies_var.set(stock)
 
     # Reader operations
