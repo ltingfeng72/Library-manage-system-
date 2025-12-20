@@ -138,15 +138,25 @@ class EnhancedLoginApp:
         self.book_isbn_var = tk.StringVar()
         ttk.Entry(input_frame, textvariable=self.book_isbn_var, width=20).grid(row=1, column=3, sticky=tk.W, padx=5, pady=3)
 
+        # Publisher
+        ttk.Label(input_frame, text="出版社:").grid(row=2, column=0, sticky=tk.W, padx=5, pady=3)
+        self.book_publisher_var = tk.StringVar()
+        ttk.Entry(input_frame, textvariable=self.book_publisher_var, width=20).grid(row=2, column=1, sticky=tk.W, padx=5, pady=3)
+
+        # Publication Date
+        ttk.Label(input_frame, text="出版日期:").grid(row=2, column=2, sticky=tk.W, padx=5, pady=3)
+        self.book_publication_date_var = tk.StringVar()
+        ttk.Entry(input_frame, textvariable=self.book_publication_date_var, width=20).grid(row=2, column=3, sticky=tk.W, padx=5, pady=3)
+
         # Shelf code
-        ttk.Label(input_frame, text="书架编号:").grid(row=2, column=0, sticky=tk.W, padx=5, pady=3)
+        ttk.Label(input_frame, text="书架编号:").grid(row=3, column=0, sticky=tk.W, padx=5, pady=3)
         self.book_shelf_var = tk.StringVar()
-        ttk.Entry(input_frame, textvariable=self.book_shelf_var, width=10).grid(row=2, column=1, sticky=tk.W, padx=5, pady=3)
+        ttk.Entry(input_frame, textvariable=self.book_shelf_var, width=10).grid(row=3, column=1, sticky=tk.W, padx=5, pady=3)
 
         # Copies
-        ttk.Label(input_frame, text="库存数量:").grid(row=2, column=2, sticky=tk.W, padx=5, pady=3)
+        ttk.Label(input_frame, text="库存数量:").grid(row=3, column=2, sticky=tk.W, padx=5, pady=3)
         self.book_copies_var = tk.StringVar(value="1")
-        ttk.Entry(input_frame, textvariable=self.book_copies_var, width=10).grid(row=2, column=3, sticky=tk.W, padx=5, pady=3)
+        ttk.Entry(input_frame, textvariable=self.book_copies_var, width=10).grid(row=3, column=3, sticky=tk.W, padx=5, pady=3)
 
         # Buttons frame
         btn_frame = ttk.Frame(tab)
@@ -163,7 +173,7 @@ class EnhancedLoginApp:
         list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
         # Create treeview
-        columns = ("ID", "书名", "作者", "ISBN", "书架", "库存")
+        columns = ("ID", "书名", "作者", "ISBN", "出版社", "出版日期", "书架", "库存")
         self.book_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=10)
         
         for col in columns:
@@ -174,6 +184,10 @@ class EnhancedLoginApp:
                 self.book_tree.column(col, width=120)
             elif col == "ISBN":
                 self.book_tree.column(col, width=120)
+            elif col == "出版社":
+                self.book_tree.column(col, width=120)
+            elif col == "出版日期":
+                self.book_tree.column(col, width=100)
             else:
                 self.book_tree.column(col, width=80)
 
@@ -204,15 +218,30 @@ class EnhancedLoginApp:
         self.reader_name_var = tk.StringVar()
         ttk.Entry(input_frame, textvariable=self.reader_name_var, width=20).grid(row=0, column=3, sticky=tk.W, padx=5, pady=3)
 
+        # Age
+        ttk.Label(input_frame, text="年龄:").grid(row=1, column=0, sticky=tk.W, padx=5, pady=3)
+        self.reader_age_var = tk.StringVar()
+        ttk.Entry(input_frame, textvariable=self.reader_age_var, width=10).grid(row=1, column=1, sticky=tk.W, padx=5, pady=3)
+
+        # Gender
+        ttk.Label(input_frame, text="性别:").grid(row=1, column=2, sticky=tk.W, padx=5, pady=3)
+        self.reader_gender_var = tk.StringVar()
+        ttk.Entry(input_frame, textvariable=self.reader_gender_var, width=10).grid(row=1, column=3, sticky=tk.W, padx=5, pady=3)
+
+        # Address
+        ttk.Label(input_frame, text="地址:").grid(row=2, column=0, sticky=tk.W, padx=5, pady=3)
+        self.reader_address_var = tk.StringVar()
+        ttk.Entry(input_frame, textvariable=self.reader_address_var, width=50).grid(row=2, column=1, columnspan=3, sticky=tk.EW, padx=5, pady=3)
+
         # Username (optional)
-        ttk.Label(input_frame, text="用户名:").grid(row=1, column=0, sticky=tk.W, padx=5, pady=3)
+        ttk.Label(input_frame, text="用户名:").grid(row=3, column=0, sticky=tk.W, padx=5, pady=3)
         self.reader_username_var = tk.StringVar()
-        ttk.Entry(input_frame, textvariable=self.reader_username_var, width=20).grid(row=1, column=1, sticky=tk.W, padx=5, pady=3)
+        ttk.Entry(input_frame, textvariable=self.reader_username_var, width=20).grid(row=3, column=1, sticky=tk.W, padx=5, pady=3)
 
         # Password (optional)
-        ttk.Label(input_frame, text="密码:").grid(row=1, column=2, sticky=tk.W, padx=5, pady=3)
+        ttk.Label(input_frame, text="密码:").grid(row=3, column=2, sticky=tk.W, padx=5, pady=3)
         self.reader_password_var = tk.StringVar()
-        ttk.Entry(input_frame, textvariable=self.reader_password_var, show="●", width=20).grid(row=1, column=3, sticky=tk.W, padx=5, pady=3)
+        ttk.Entry(input_frame, textvariable=self.reader_password_var, show="●", width=20).grid(row=3, column=3, sticky=tk.W, padx=5, pady=3)
 
         # Buttons
         btn_frame = ttk.Frame(tab)
@@ -229,11 +258,17 @@ class EnhancedLoginApp:
         list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
         # Create treeview
-        columns = ("ID", "姓名", "用户名", "角色")
+        columns = ("ID", "姓名", "年龄", "性别", "地址", "用户名", "角色")
         self.reader_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=12)
         
         for col in columns:
             self.reader_tree.heading(col, text=col)
+            if col == "地址":
+                self.reader_tree.column(col, width=200)
+            elif col == "姓名":
+                self.reader_tree.column(col, width=100)
+            else:
+                self.reader_tree.column(col, width=80)
             if col == "姓名":
                 self.reader_tree.column(col, width=150)
             elif col == "用户名":
@@ -408,6 +443,8 @@ class EnhancedLoginApp:
                 title=title,
                 author=self.book_author_var.get().strip() or None,
                 isbn=self.book_isbn_var.get().strip() or None,
+                publisher=self.book_publisher_var.get().strip() or None,
+                publication_date=self.book_publication_date_var.get().strip() or None,
                 shelf_code=self.book_shelf_var.get().strip() or None,
                 total_copies=copies
             )
@@ -444,6 +481,8 @@ class EnhancedLoginApp:
                 title=self.book_title_var.get().strip() or None,
                 author=self.book_author_var.get().strip() or None,
                 isbn=self.book_isbn_var.get().strip() or None,
+                publisher=self.book_publisher_var.get().strip() or None,
+                publication_date=self.book_publication_date_var.get().strip() or None,
                 shelf_code=self.book_shelf_var.get().strip() or None,
                 total_copies=copies
             )
@@ -485,6 +524,8 @@ class EnhancedLoginApp:
         self.book_title_var.set("")
         self.book_author_var.set("")
         self.book_isbn_var.set("")
+        self.book_publisher_var.set("")
+        self.book_publication_date_var.set("")
         self.book_shelf_var.set("")
         self.book_copies_var.set("1")
 
@@ -494,13 +535,16 @@ class EnhancedLoginApp:
         if selection:
             item = self.book_tree.item(selection[0])
             values = item['values']
+            # columns = ("ID", "书名", "作者", "ISBN", "出版社", "出版日期", "书架", "库存")
             self.book_id_var.set(values[0])
             self.book_title_var.set(values[1])
             self.book_author_var.set(values[2] if values[2] != 'N/A' else '')
             self.book_isbn_var.set(values[3] if values[3] != 'N/A' else '')
-            self.book_shelf_var.set(values[4] if values[4] != 'N/A' else '')
+            self.book_publisher_var.set(values[4] if len(values) > 4 and values[4] != 'N/A' else '')
+            self.book_publication_date_var.set(values[5] if len(values) > 5 and values[5] != 'N/A' else '')
+            self.book_shelf_var.set(values[6] if len(values) > 6 and values[6] != 'N/A' else '')
             # Parse stock info (e.g., "3/5"), more robust handling
-            stock_str = str(values[5])
+            stock_str = str(values[7]) if len(values) > 7 else "1"
             try:
                 if '/' in stock_str:
                     parts = stock_str.split('/')
@@ -525,9 +569,15 @@ class EnhancedLoginApp:
             return
         
         try:
+            age_str = self.reader_age_var.get().strip()
+            age = int(age_str) if age_str else None
+            
             reader_id = self.system.add_reader(
                 self.current_user,
                 name=name,
+                age=age,
+                gender=self.reader_gender_var.get().strip() or None,
+                address=self.reader_address_var.get().strip() or None,
                 username=self.reader_username_var.get().strip() or None,
                 password=self.reader_password_var.get() or None
             )
@@ -549,10 +599,16 @@ class EnhancedLoginApp:
             return
         
         try:
+            age_str = self.reader_age_var.get().strip()
+            age = int(age_str) if age_str else None
+            
             self.system.update_reader(
                 self.current_user,
                 int(reader_id),
-                name=self.reader_name_var.get().strip() or None
+                name=self.reader_name_var.get().strip() or None,
+                age=age,
+                gender=self.reader_gender_var.get().strip() or None,
+                address=self.reader_address_var.get().strip() or None
             )
             messagebox.showinfo("成功", "读者信息已更新！")
             self.clear_reader_form()
@@ -590,6 +646,9 @@ class EnhancedLoginApp:
     def clear_reader_form(self) -> None:
         self.reader_id_var.set("")
         self.reader_name_var.set("")
+        self.reader_age_var.set("")
+        self.reader_gender_var.set("")
+        self.reader_address_var.set("")
         self.reader_username_var.set("")
         self.reader_password_var.set("")
 
@@ -599,9 +658,13 @@ class EnhancedLoginApp:
         if selection:
             item = self.reader_tree.item(selection[0])
             values = item['values']
+            # columns = ("ID", "姓名", "年龄", "性别", "地址", "用户名", "角色")
             self.reader_id_var.set(values[0])
             self.reader_name_var.set(values[1])
-            self.reader_username_var.set(values[2] if values[2] != 'N/A' else '')
+            self.reader_age_var.set(values[2] if len(values) > 2 and values[2] not in ('N/A', None, '') else '')
+            self.reader_gender_var.set(values[3] if len(values) > 3 and values[3] not in ('N/A', None, '') else '')
+            self.reader_address_var.set(values[4] if len(values) > 4 and values[4] not in ('N/A', None, '') else '')
+            self.reader_username_var.set(values[5] if len(values) > 5 and values[5] not in ('N/A', None, '') else '')
 
     # Borrow/Return operations
     def borrow_book(self) -> None:
@@ -677,6 +740,8 @@ class EnhancedLoginApp:
                     book['title'],
                     book.get('author') or 'N/A',
                     book.get('isbn') or 'N/A',
+                    book.get('publisher') or 'N/A',
+                    book.get('publication_date') or 'N/A',
                     book.get('shelf_code') or 'N/A',
                     stock
                 ))
@@ -703,6 +768,9 @@ class EnhancedLoginApp:
                 self.reader_tree.insert("", tk.END, values=(
                     reader['id'],
                     reader['name'],
+                    reader.get('age') or 'N/A',
+                    reader.get('gender') or 'N/A',
+                    reader.get('address') or 'N/A',
                     reader.get('username') or 'N/A',
                     reader.get('role') or 'N/A'
                 ))
