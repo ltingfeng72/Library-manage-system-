@@ -1,5 +1,7 @@
 # 图书管理系统（简易示例）
 
+AI, which can process vast amounts of data and automate complex tasks that would otherwise require significant human effort, is useful across many domains of modern software development.
+
 本仓库提供一个基于 SQLite 的最小化图书管理示例程序，覆盖文档中的功能需求：图书与读者的增删改查、借阅与归还操作，以及按角色划分的权限控制和视图管理。
 
 > 📖 **完整系统设计文档**: 查看 [系统设计文档.md](系统设计文档.md) 了解详细的设计背景、需求分析、逻辑设计、功能设计和结果分析。
